@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiliSync 下载配置</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #data-table-container {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .status-success {
+            color: green;
+        }
+
+        .status-error {
+            color: red;
+        }
+
+        .status-downloading {
+            color: orange;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+        }
+
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>BiliSync 下载配置</h1>
+        <form id="task-form">
+            <label for="video_type">编号类型:</label>
+            <select id="video_type" name="video_type">
+                <option value="video">视频编号或URL</option>
+                <option value="season">合集URL</option>
+                <option value="series">系列URL</option>
+                <option value="fav">收藏夹URL</option>
+            </select>
+
+            <label for="video_id_or_url">编号:</label>
+            <input type="text" id="video_id_or_url" name="video_id_or_url" required>
+
+            <button type="submit">添加配置</button>
+        </form>
+
+        <h2>下载任务状态:</h2>
+        <div id="task-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="task-list">
+                </tbody>
+            </table>
+            <div class="pagination" id="pagination-controls">
+                <button id="prev-page" disabled>&lt; 上一页</button>
+                <span id="page-info">第 1 / 1 页</span>
+                <button id="next-page" disabled>下一页 &gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const taskFormDom = document.getElementById('task-form');
+        const taskListDom = document.getElementById('task-list');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const pageInfoDom = document.getElementById('page-info');
+
+        let currentPage = 1;
+        let totalPages = 1; // 初始假设总页数为 1
+
+        // 初始化页面，获取第一页数据
+        getTaskList(currentPage);
+
+        // 渲染表格数据
+        function renderTable(tasks) {
+            taskListDom.innerHTML = ''; // 清空表格
+
+            if (!tasks || tasks.length === 0) {
+                renderEmptyRow('暂无下载任务。');
+                return;
+            }
+
+            tasks.forEach(task => {
+                const row = taskListDom.insertRow();
+                row.insertCell().textContent = task.bvid || 'N/A';
+                const statusCell = row.insertCell();
+                statusCell.textContent = task.status || 'N/A';
+
+                // 根据状态添加 CSS 类
+                if (task.status === 'success') {
+                    statusCell.className = 'status-success';
+                } else if (task.status === 'error') {
+                    statusCell.className = 'status-error';
+                } else if (task.status === 'processing') {
+                    statusCell.className = 'status-downloading';
+                }
+            });
+        }
+
+        // 更新分页控件状态
+        function updatePaginationControls() {
+            pageInfoDom.textContent = `第 ${currentPage} / ${totalPages || 1} 页`;
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+        }
+
+        // 渲染空行提示
+        function renderEmptyRow(message) {
+            const row = taskListDom.insertRow();
+            const cell = row.insertCell();
+            cell.colSpan = 2; // 表格有两列
+            cell.textContent = message;
+            cell.style.textAlign = 'center';
+        }
+
+        // 渲染错误行提示
+        function renderErrorRow(message) {
+            taskListDom.innerHTML = ''; // 清空可能存在的旧内容
+            const row = taskListDom.insertRow();
+            const cell = row.insertCell();
+            cell.colSpan = 2; // 表格有两列
+            cell.textContent = message;
+            cell.style.color = 'red';
+            cell.style.textAlign = 'center';
+        }
+
+        // 获取指定页码的任务列表
+        function getTaskList(page) {
+            fetch(`/api/video?page=${page}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 检查返回的数据结构
+                    if (data && Array.isArray(data.items) && typeof data.total_pages === 'number') {
+                        currentPage = page; // 更新当前页码
+                        totalPages = data.total_pages; // 更新总页数
+                        renderTable(data.items); // 渲染表格
+                        updatePaginationControls(); // 更新分页控件
+                    } else {
+                        console.error('Error: Invalid data format received from server.', data);
+                        renderErrorRow('获取数据失败 (格式错误)!');
+                        // 可以选择禁用分页按钮
+                        prevPageBtn.disabled = true;
+                        nextPageBtn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching task:', error);
+                    renderErrorRow(`获取数据失败: ${error.message}`);
+                    // 可以选择禁用分页按钮
+                    prevPageBtn.disabled = true;
+                    nextPageBtn.disabled = true;
+                });
+        };
+
+        // 上一页按钮点击事件
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                getTaskList(currentPage - 1);
+            }
+        });
+
+        // 下一页按钮点击事件
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                getTaskList(currentPage + 1);
+            }
+        });
+
+        // 添加任务表单提交事件
+        taskFormDom.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const video_type = document.getElementById('video_type').value;
+            const video_id_or_url = document.getElementById('video_id_or_url').value;
+
+            const sendRequest = (url, data) => {
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        const success = response.ok;
+                        alert(success ? '添加配置成功!' : '添加配置失败!');
+                        success && getTaskList(1);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('添加配置失败!');
+                    });
+            };
+
+            const typeConfigs = {
+                season: { endpoint: '/api/season', dataKey: 'season_url' },
+                series: { endpoint: '/api/series', dataKey: 'series_url' },
+                video: { endpoint: '/api/video', dataKey: 'video_id_or_url' },
+                fav: { endpoint: '/api/fav', dataKey: 'fav_url' },
+            };
+
+            const currentConfig = typeConfigs[video_type];
+
+            const requestConfig = {
+                endpoint: currentConfig.endpoint,
+                data: {
+                    [currentConfig.dataKey]: video_id_or_url
+                }
+            };
+            sendRequest(requestConfig.endpoint, requestConfig.data);
+
+        });
+    </script>
+</body>
+
+</html>
