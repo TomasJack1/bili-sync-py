@@ -96,12 +96,23 @@ async def add_season(
     mid = search_result[0]
     season_id = search_result[1]
 
-    video_list_info = await bilibili.get_video_list_info_from_season(mid, season_id)
+    season_info = await bilibili.get_season_info(mid, season_id)
+    video_list_info = season_info["archives"]
+    season_name = season_info["meta"]["name"]
 
     if video_list_info is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="传入的season链接无效")
 
-    video_list = [Video(bvid=video.get("bvid"), pic=video.get("pic"), title=video.get("title"), aid=video.get("aid")) for video in video_list_info]
+    video_list = [
+        Video(
+            bvid=video.get("bvid"),
+            pic=video.get("pic"),
+            title=video.get("title"),
+            aid=video.get("aid"),
+            belong=season_name,
+        )
+        for video in video_list_info
+    ]
 
     stmt = insert(Video).values([video.model_dump() for video in video_list]).on_conflict_do_nothing(index_elements=["bvid"])
 

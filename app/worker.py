@@ -2,6 +2,7 @@ import asyncio
 import os
 import random
 import re
+import shutil
 import typing
 from pathlib import Path
 
@@ -121,10 +122,11 @@ async def scan_video():
         video_bvid = video.bvid
         video_tile = video.title
         video_aid = video.aid
+        video_belong = video.belong
         video_page_info = await bilibili.get_video_page_info(video_bvid)
 
         # 视频保存目录
-        video_page_save_dir = DOWNLOAD_DIR / video_tile
+        video_page_save_dir = DOWNLOAD_DIR / get_legal_filename(video_belong) / get_legal_filename(video_tile)
 
         # 创建视频文件夹
         os.makedirs(video_page_save_dir, exist_ok=True)
@@ -141,10 +143,10 @@ async def scan_video():
             # 音频保存位置
             video_page_audio_save_path = video_page_save_dir / get_legal_filename(video_page_title + ".m4a")
             # 创建ffmpeg视频合成临时输出文件
-            video_page_temp_save_path = video_page_save_dir / (video_page_title + "-temp.mp4")
+            video_page_temp_save_path = video_page_save_dir / get_legal_filename(video_page_title + "-temp.mp4")
             # 弹幕保存位置
             video_page_dm_save_path = video_page_save_dir / get_legal_filename(video_page_title + ".ass")
-            # 封面保存位置
+            # 视频封面保存位置
             video_pic_save_path = video_page_save_dir / get_legal_filename(video_page_title + ".jpg")
 
             if not os.path.exists(video_page_save_path) or not os.path.exists(video_page_audio_save_path):
@@ -221,6 +223,10 @@ async def scan_video():
                     await f.write(pic)
 
                 logger.warning(f"{video_bvid}-{video_tile}-封面下载完成")
+
+        # 如果视频为合集、收藏夹、系列里面的视频，需要设置合集、收藏夹、系列封面（使用第一个视频的封面作为）
+        if video_belong != "" and not os.path.exists(video_page_save_dir.parent / (video_belong + ".jpg")):
+            shutil.copyfile(video_pic_save_path, video_page_save_dir.parent / (video_belong + ".jpg"))
 
         # 更新视频数据库状态为成功
         async with async_db_session() as session:

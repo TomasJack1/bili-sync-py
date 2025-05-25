@@ -70,7 +70,7 @@ async def get_video_page_info(video_id: str) -> Optional[dict]:
 
 
 @rate_limit()
-async def get_video_list_info_from_season(mid: str, season_id: str) -> Optional[List[dict]]:
+async def get_season_info(mid: str, season_id: str) -> Optional[List[dict]]:
     """获取视频合集基本信息
 
     Args:
@@ -83,7 +83,7 @@ async def get_video_list_info_from_season(mid: str, season_id: str) -> Optional[
     total_pages = 1
     page_num = 1
     page_size = 30
-    result = []
+    result = None
     async with httpx.AsyncClient() as client:
         while page_num <= total_pages:
             response = await client.get(
@@ -110,11 +110,12 @@ async def get_video_list_info_from_season(mid: str, season_id: str) -> Optional[
             if page_num == 1:
                 total_pages = math.ceil(response["data"]["meta"]["total"] / page_size)
 
-            result += response["data"]["archives"]
+            if result is None:
+                result = response["data"]
+            else:
+                result["archives"] += response["data"]["archives"]
 
             page_num += 1
-
-            asyncio.sleep(0.5)
 
     return result
 

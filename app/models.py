@@ -15,6 +15,7 @@ class Video(SQLModel, table=True):
     aid: int = 0
     title: str = "未指定名称"
     pic: str = "https://m.media-amazon.com/images/I/51i0m01RSxL.png"
+    belong: str = ""
     created_at: str = datetime.now(tz=timezone(timedelta(hours=8))).strftime(
         "%Y年%m月%d日 %H:%M:%S",
     )
