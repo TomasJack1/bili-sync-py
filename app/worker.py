@@ -6,7 +6,7 @@ import typing
 from pathlib import Path
 
 import aiofiles
-from sqlmodel import update, select
+from sqlmodel import select, update
 
 from app import bilibili
 from app.db import async_db_session
