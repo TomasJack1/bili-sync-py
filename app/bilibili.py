@@ -71,7 +71,7 @@ async def get_video_page_info(video_id: str) -> Optional[dict]:
 
 @rate_limit()
 async def get_season_info(mid: str, season_id: str) -> Optional[List[dict]]:
-    """获取视频合集基本信息
+    """获取视频合集信息
 
     Args:
         mid (str): 合集mid
@@ -273,8 +273,8 @@ async def download_video_pic(video_pic_download_url: str) -> bytes:
 
 
 @rate_limit()
-async def get_video_fav_id(media_id: str) -> dict:
-    """获取收藏夹视频列表
+async def get_fav_info(media_id: str) -> dict:
+    """获取收藏夹信息
 
     Args:
         media_id (str): 收藏夹id
@@ -284,7 +284,7 @@ async def get_video_fav_id(media_id: str) -> dict:
     """
     has_more = True
     page_num = 1
-    result = []
+    result = None
 
     async with httpx.AsyncClient() as client:
         while True:
@@ -312,10 +312,12 @@ async def get_video_fav_id(media_id: str) -> dict:
             if response.get("code") != 0:
                 return None
 
-            response = response["data"]
-            result += response["medias"]
+            if result is None:
+                result = response["data"]
+            else:
+                result["medias"] += response["data"]["medias"]
 
-            has_more = response["has_more"]
+            has_more = response["data"]["has_more"]
 
             if not has_more:
                 break

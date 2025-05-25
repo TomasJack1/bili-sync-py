@@ -178,7 +178,9 @@ async def add_fav(
 
     media_id = search_result[0]
 
-    video_list_info = await bilibili.get_video_fav_id(media_id=media_id)
+    fav_info = await bilibili.get_fav_info(media_id=media_id)
+    video_list_info = fav_info["medias"]
+    fav_name = fav_info["info"]["title"]
 
     video_list = [
         Video(
@@ -186,6 +188,7 @@ async def add_fav(
             pic=video.get("cover"),
             title=video.get("title"),
             aid=video.get("id"),
+            belong=fav_name,
         )
         for video in video_list_info
     ]
