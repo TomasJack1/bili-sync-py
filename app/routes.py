@@ -139,7 +139,9 @@ async def add_series(
     mid = search_result[0]
     series_id = search_result[1]
 
-    video_list_info = await bilibili.get_video_list_info_from_series(mid, series_id)
+    series_info = await bilibili.get_series_info(mid, series_id)
+    video_list_info = series_info["archives"]
+    series_name = series_info["name"]
 
     if video_list_info is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="传入的season链接无效")
@@ -150,6 +152,7 @@ async def add_series(
             pic=video.get("pic"),
             title=video.get("title"),
             aid=video.get("aid"),
+            belong=series_name,
         )
         for video in video_list_info
     ]

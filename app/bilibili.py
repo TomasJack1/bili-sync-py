@@ -121,12 +121,56 @@ async def get_season_info(mid: str, season_id: str) -> Optional[List[dict]]:
 
 
 @rate_limit()
-async def get_video_list_info_from_series(mid: str, series_id: str) -> Optional[List[dict]]:
+async def get_series_info(mid: str, series_id: str) -> Optional[List[dict]]:
+    """获取系列视频
+
+    Args:
+        mid (str): mid
+        series_id (str): 系列id
+
+    Returns:
+        Optional[List[dict]]: 系列信息
+    """
+    total_pages = 1
+    page_num = 1
+    page_size = 30
+    result = None
     async with httpx.AsyncClient() as client:
+        while page_num <= total_pages:
+            response = await client.get(
+                "https://api.bilibili.com/x/series/archives",
+                params={
+                    "mid": mid,
+                    "series_id": series_id,
+                    "ps": page_size,
+                    "pn": page_num,
+                },
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+                },
+            )
+
+            if response.status_code != httpx.codes.OK:
+                return None
+
+            response = response.json()
+
+            if response.get("code") != 0:
+                return None
+
+            if page_num == 1:
+                total_pages = math.ceil(response["data"]["page"]["total"] / page_size)
+
+            if result is None:
+                result = response["data"]
+            else:
+                result["archives"] += response["data"]["archives"]
+
+            page_num += 1
+
         response = await client.get(
-            "https://api.bilibili.com/x/series/archives",
+            "https://api.bilibili.com/x/series/series",
             params={
-                "mid": mid,
                 "series_id": series_id,
             },
             headers={
@@ -142,7 +186,9 @@ async def get_video_list_info_from_series(mid: str, series_id: str) -> Optional[
         if response.get("code") != 0:
             return None
 
-        return response["data"]["archives"]
+        result["name"] = response["data"]["meta"]["name"]
+
+    return result
 
 
 @rate_limit()
