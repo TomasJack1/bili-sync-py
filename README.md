@@ -15,6 +15,7 @@
 - **📚 全场景支持**：单个视频、视频合集、视频列表、收藏夹统统拿下！
 - **📥 智能抓取**：自动下载视频**弹幕**（支持多语言轨道）。
 - **🔄 媒体库兼容**：完美适配 **Jellyfin/Plex**，文件名与元数据标准化。
+![](https://github.com/TomasJack1/bili-sync-py/blob/main/images/main-menu.png?raw=true)
 ---
 
 ## 🛠️ 快速开始
