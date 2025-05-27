@@ -4,296 +4,791 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiliSync 下载配置</title>
+    <title>B站下载配置</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        .container {
-            width: 80%;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: #007bff;
-        }
-
-        form {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
             box-sizing: border-box;
         }
 
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        /* 顶部导航栏 */
+        .navbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        #data-table-container {
-            margin-top: 20px;
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+        .logo i {
+            font-size: 2rem;
         }
 
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
+        .nav-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .status-success {
-            color: green;
-        }
-
-        .status-error {
-            color: red;
-        }
-
-        .status-downloading {
-            color: orange;
-        }
-
-        .pagination {
-            margin-top: 20px;
+        .stat-item {
             text-align: center;
         }
 
-        .pagination button {
-            margin: 0 5px;
-            padding: 5px 10px;
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
-        .pagination button:disabled {
-            background-color: #ccc;
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* 左侧面板 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: sticky;
+            top: 100px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .pagination span {
-            margin: 0 10px;
-            font-weight: bold;
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* 快速统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.success {
+            background: rgb(16 185 129 / 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-icon.warning {
+            background: rgb(245 158 11 / 0.1);
+            color: var(--warning-color);
+        }
+
+        .stat-icon.error {
+            background: rgb(239 68 68 / 0.1);
+            color: var(--error-color);
+        }
+
+        .stat-icon.primary {
+            background: rgb(99 102 241 / 0.1);
+            color: var(--primary-color);
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* 表格样式 */
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+            flex-shrink: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            height: 100%;
+        }
+
+        .table th {
+            background: var(--bg-primary);
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+        }
+
+        .table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-primary);
+        }
+
+        /* 状态徽章 */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-success {
+            background: rgb(16 185 129 / 0.1);
+            color: var(--success-color);
+        }
+
+        .status-error {
+            background: rgb(239 68 68 / 0.1);
+            color: var(--error-color);
+        }
+
+        .status-processing {
+            background: rgb(245 158 11 / 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-pending {
+            background: rgb(99 102 241 / 0.1);
+            color: var(--primary-color);
+        }
+
+        /* 分页 */
+        .pagination {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+            flex-shrink: 0;
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-state td {
+            border-bottom: none !important;
+        }
+
+        .error-state {
+            color: var(--error-color);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .loading td {
+            border-bottom: none !important;
+        }
+
+        .spinner {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .nav-stats {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 0.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table th,
+            .table td {
+                padding: 0.75rem;
+                font-size: 0.875rem;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <i class="fab fa-bilibili"></i>
+                <span>Dashboard</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
     <div class="container">
-        <h1>BiliSync 下载配置</h1>
-        <form id="task-form">
-            <label for="video_type">编号类型:</label>
-            <select id="video_type" name="video_type">
-                <option value="video">视频编号或URL</option>
-                <option value="season">合集URL</option>
-                <option value="series">系列URL</option>
-                <option value="fav">收藏夹URL</option>
-            </select>
+        <!-- 左侧面板 -->
+        <div class="sidebar">
+            <!-- 添加任务卡片 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-plus"></i>
+                        添加下载任务
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="task-form">
+                        <div class="form-group">
+                            <label class="form-label" for="video_type">
+                                <i class="fas fa-tag"></i>
+                                内容类型
+                            </label>
+                            <select id="video_type" name="video_type" class="form-control">
+                                <option value="video">🎬 单个视频</option>
+                                <option value="season">📺 视频合集</option>
+                                <option value="series">📋 视频系列</option>
+                                <option value="fav">⭐ 收藏夹</option>
+                            </select>
+                        </div>
 
-            <label for="video_id_or_url">编号:</label>
-            <input type="text" id="video_id_or_url" name="video_id_or_url" required>
+                        <div class="form-group">
+                            <label class="form-label" for="video_id_or_url">
+                                <i class="fas fa-link"></i>
+                                链接或编号
+                            </label>
+                            <input type="text" id="video_id_or_url" name="video_id_or_url" class="form-control"
+                                placeholder="输入BV号、av号或完整URL" required>
+                        </div>
 
-            <button type="submit">添加配置</button>
-        </form>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-download"></i>
+                            添加到下载队列
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-        <h2>下载任务状态:</h2>
-        <div id="task-table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>状态</th>
-                    </tr>
-                </thead>
-                <tbody id="task-list">
-                </tbody>
-            </table>
-            <div class="pagination" id="pagination-controls">
-                <button id="prev-page" disabled>&lt; 上一页</button>
-                <span id="page-info">第 1 / 1 页</span>
-                <button id="next-page" disabled>下一页 &gt;</button>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1 class="content-title">下载任务列表</h1>
+                <button class="btn btn-primary btn-sm" onclick="refreshTasks()">
+                    <i class="fas fa-sync-alt"></i>
+                    刷新
+                </button>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>任务管理</h3>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-video"></i> 视频标题</th>
+                                <th><i class="fas fa-info-circle"></i> 标题ID </th>
+                                <th><i class="fas fa-info-circle"></i> 状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task-list">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <div class="pagination-info" id="pagination-info">
+                        显示第 0-0 项，共 0 项
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="btn btn-sm btn-primary" id="prev-page" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                            上一页
+                        </button>
+                        <button class="btn btn-sm btn-primary" id="next-page" disabled>
+                            下一页
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const taskFormDom = document.getElementById('task-form');
-        const taskListDom = document.getElementById('task-list');
+        // 全局变量
+        let currentPage = 1;
+        let totalPages = 1;
+        let totalTasks = 0;
+        let taskStats = { success: 0, processing: 0 };
+
+        // DOM 元素
+        const taskForm = document.getElementById('task-form');
+        const taskList = document.getElementById('task-list');
         const prevPageBtn = document.getElementById('prev-page');
         const nextPageBtn = document.getElementById('next-page');
-        const pageInfoDom = document.getElementById('page-info');
+        const paginationInfo = document.getElementById('pagination-info');
 
-        let currentPage = 1;
-        let totalPages = 1; // 初始假设总页数为 1
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            loadTasks(1);
+        });
 
-        // 初始化页面，获取第一页数据
-        getTaskList(currentPage);
+        // 状态映射
+        const statusMap = {
+            'success': { text: '下载完成', icon: 'check', class: 'success' },
+            'processing': { text: '正在下载', icon: 'spinner fa-spin', class: 'processing' },
+        };
 
-        // 渲染表格数据
-        function renderTable(tasks) {
-            taskListDom.innerHTML = ''; // 清空表格
+        // 渲染任务列表
+        function renderTasks(tasks) {
+            taskList.innerHTML = '';
 
             if (!tasks || tasks.length === 0) {
-                renderEmptyRow('暂无下载任务。');
+                renderEmptyState();
                 return;
             }
 
-            tasks.forEach(task => {
-                const row = taskListDom.insertRow();
-                row.insertCell().textContent = task.bvid || 'N/A';
-                const statusCell = row.insertCell();
-                statusCell.textContent = task.status || 'N/A';
+            tasks.forEach((task, index) => {
+                const row = document.createElement('tr');
+                const status = statusMap[task.status] || { text: task.status, icon: 'question', class: 'pending' };
 
-                // 根据状态添加 CSS 类
-                if (task.status === 'success') {
-                    statusCell.className = 'status-success';
-                } else if (task.status === 'error') {
-                    statusCell.className = 'status-error';
-                } else if (task.status === 'processing') {
-                    statusCell.className = 'status-downloading';
-                }
+                // <i class="fas fa-video" style="color: var(--primary-color);"></i>
+                row.innerHTML = `
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <a href="https://bilibili.com/video/${task.bvid}">
+                                <span style="font-family: monospace; font-weight: 600;">${task.title || 'N/A'}</span>
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-family: monospace; font-weight: 600;">${task.bvid || 'N/A'}</span>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="status-badge status-${status.class}">
+                            <i class="fas fa-${status.icon}"></i>
+                            ${status.text}
+                        </span>
+                    </td>
+                    `;
+                taskList.appendChild(row);
             });
+
         }
 
-        // 更新分页控件状态
-        function updatePaginationControls() {
-            pageInfoDom.textContent = `第 ${currentPage} / ${totalPages || 1} 页`;
-            prevPageBtn.disabled = currentPage <= 1;
-            nextPageBtn.disabled = currentPage >= totalPages;
+        // 渲染空状态
+        function renderEmptyState() {
+            taskList.innerHTML = `
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h3>暂无下载任务</h3>
+                        <p>开始添加您的第一个下载任务吧！</p>
+                    </td>
+                </tr>
+            `;
         }
 
-        // 渲染空行提示
-        function renderEmptyRow(message) {
-            const row = taskListDom.insertRow();
-            const cell = row.insertCell();
-            cell.colSpan = 2; // 表格有两列
-            cell.textContent = message;
-            cell.style.textAlign = 'center';
+        // 渲染加载状态
+        function renderLoadingState() {
+            taskList.innerHTML = `
+                <tr>
+                    <td colspan="4" class="loading">
+                        <div class="spinner"></div>
+                        正在加载任务列表...
+                    </td>
+                </tr>
+            `;
         }
 
-        // 渲染错误行提示
-        function renderErrorRow(message) {
-            taskListDom.innerHTML = ''; // 清空可能存在的旧内容
-            const row = taskListDom.insertRow();
-            const cell = row.insertCell();
-            cell.colSpan = 2; // 表格有两列
-            cell.textContent = message;
-            cell.style.color = 'red';
-            cell.style.textAlign = 'center';
+        // 渲染错误状态
+        function renderErrorState(message) {
+            taskList.innerHTML = `
+                <tr>
+                    <td colspan="4" class="empty-state error-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>加载失败</h3>
+                        <p>${message}</p>
+                        <button class="btn btn-primary btn-sm" onclick="loadTasks(${currentPage})" style="margin-top: 1rem;">
+                            <i class="fas fa-refresh"></i>
+                            重新加载
+                        </button>
+                    </td>
+                </tr>
+            `;
         }
 
-        // 获取指定页码的任务列表
-        function getTaskList(page) {
-            fetch(`/api/video?page=${page}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // 检查返回的数据结构
-                    if (data && Array.isArray(data.items) && typeof data.total_pages === 'number') {
-                        currentPage = page; // 更新当前页码
-                        totalPages = data.total_pages; // 更新总页数
-                        renderTable(data.items); // 渲染表格
-                        updatePaginationControls(); // 更新分页控件
-                    } else {
-                        console.error('Error: Invalid data format received from server.', data);
-                        renderErrorRow('获取数据失败 (格式错误)!');
-                        // 可以选择禁用分页按钮
-                        prevPageBtn.disabled = true;
-                        nextPageBtn.disabled = true;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching task:', error);
-                    renderErrorRow(`获取数据失败: ${error.message}`);
-                    // 可以选择禁用分页按钮
-                    prevPageBtn.disabled = true;
-                    nextPageBtn.disabled = true;
-                });
-        };
+        // 修复：更新分页信息
+        function updatePagination(pageNum, pageSize) {
+            if (pageSize && pageSize > 0) {
+                const start = (pageNum - 1) * pageSize + 1;
+                const end = start + pageSize - 1;
+                paginationInfo.textContent = `显示第 ${start}-${end} 项，共 ${totalPages || '未知'} 页`;
+            }
 
-        // 上一页按钮点击事件
+            prevPageBtn.disabled = pageNum <= 1;
+            nextPageBtn.disabled = pageNum >= totalPages || totalPages <= 1;
+        }
+
+        // 加载任务列表
+        async function loadTasks(page) {
+            if (!document.hidden) { // 只在页面可见时显示加载状态
+                renderLoadingState();
+            }
+
+            try {
+                const response = await fetch(`/api/video?page=${page}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data && Array.isArray(data.items) && typeof data.total_pages === 'number') {
+                    renderTasks(data.items);
+                    totalPages = data.total_pages
+                    totalTasks = data.total
+                    updatePagination(page, data.items.length);
+                } else {
+                    throw new Error('返回数据格式错误');
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                renderErrorState(error.message);
+                // 禁用分页按钮
+                prevPageBtn.disabled = true;
+                nextPageBtn.disabled = true;
+            }
+        }
+
+        // 刷新任务列表
+        function refreshTasks() {
+            loadTasks(currentPage);
+        }
+
+
+        // 分页事件
         prevPageBtn.addEventListener('click', () => {
             if (currentPage > 1) {
-                getTaskList(currentPage - 1);
+                loadTasks(--currentPage);
             }
         });
 
-        // 下一页按钮点击事件
         nextPageBtn.addEventListener('click', () => {
             if (currentPage < totalPages) {
-                getTaskList(currentPage + 1);
+                loadTasks(++currentPage);
             }
         });
 
-        // 添加任务表单提交事件
-        taskFormDom.addEventListener('submit', function (event) {
+        // 表单提交事件
+        taskForm.addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            const video_type = document.getElementById('video_type').value;
-            const video_id_or_url = document.getElementById('video_id_or_url').value;
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalContent = submitBtn.innerHTML;
 
-            const sendRequest = (url, data) => {
-                fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                    .then(response => {
-                        const success = response.ok;
-                        alert(success ? '添加配置成功!' : '添加配置失败!');
-                        success && getTaskList(1);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('添加配置失败!');
-                    });
-            };
+            // 设置提交状态
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner" style="width: 1rem; height: 1rem;"></div> 添加中...';
+
+            const videoType = document.getElementById('video_type').value;
+            const videoIdOrUrl = document.getElementById('video_id_or_url').value;
 
             const typeConfigs = {
                 season: { endpoint: '/api/season', dataKey: 'season_url' },
@@ -302,16 +797,29 @@
                 fav: { endpoint: '/api/fav', dataKey: 'fav_url' },
             };
 
-            const currentConfig = typeConfigs[video_type];
+            const config = typeConfigs[videoType];
+            const requestData = { [config.dataKey]: videoIdOrUrl };
 
-            const requestConfig = {
-                endpoint: currentConfig.endpoint,
-                data: {
-                    [currentConfig.dataKey]: video_id_or_url
+            try {
+                const response = await fetch(config.endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('video_id_or_url').value = '';
+                    loadTasks(1); // 重新加载第一页
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
                 }
-            };
-            sendRequest(requestConfig.endpoint, requestConfig.data);
-
+            } catch (error) {
+                console.error('Error adding task:', error);
+            } finally {
+                // 恢复按钮状态
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
+            }
         });
     </script>
 </body>
