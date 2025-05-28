@@ -25,6 +25,7 @@ async def get_video_list(
 ) -> _Page[GetVideoInfoSchema]:
     statement = select(Video).where(
         or_(
+            Video.bvid == q,
             Video.title.ilike(f"%{q}%"),
             Video.belong.ilike(f"%{q}%"),
         ),
