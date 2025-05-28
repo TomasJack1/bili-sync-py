@@ -213,6 +213,16 @@
             font-size: 0.875rem;
         }
 
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
         /* 快速统计卡片 */
         .stats-grid {
             display: grid;
@@ -234,36 +244,6 @@
             box-shadow: var(--shadow-md);
         }
 
-        .stat-icon {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.5rem;
-        }
-
-        .stat-icon.success {
-            background: rgb(16 185 129 / 0.1);
-            color: var(--success-color);
-        }
-
-        .stat-icon.warning {
-            background: rgb(245 158 11 / 0.1);
-            color: var(--warning-color);
-        }
-
-        .stat-icon.error {
-            background: rgb(239 68 68 / 0.1);
-            color: var(--error-color);
-        }
-
-        .stat-icon.primary {
-            background: rgb(99 102 241 / 0.1);
-            color: var(--primary-color);
-        }
 
         /* 主内容区域 */
         .main-content {
@@ -304,6 +284,85 @@
             align-items: center;
             background: var(--bg-primary);
             flex-shrink: 0;
+        }
+
+        .table-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .table-header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .search-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-group:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            padding: 0.5rem;
+            background: transparent;
+            font-size: 0.875rem;
+            width: 200px;
+            color: var(--text-primary);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-btn {
+            padding: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: calc(var(--radius) - 2px);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .clear-search {
+            padding: 0.5rem;
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clear-search:hover {
+            background: var(--text-primary);
         }
 
         .table-wrapper {
@@ -364,20 +423,11 @@
             color: var(--success-color);
         }
 
-        .status-error {
-            background: rgb(239 68 68 / 0.1);
-            color: var(--error-color);
-        }
-
         .status-processing {
             background: rgb(245 158 11 / 0.1);
             color: var(--warning-color);
         }
 
-        .status-pending {
-            background: rgb(99 102 241 / 0.1);
-            color: var(--primary-color);
-        }
 
         /* 分页 */
         .pagination {
@@ -473,6 +523,12 @@
             .stats-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
+
+            .table-header-right {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
         }
 
         @media (max-width: 640px) {
@@ -492,6 +548,20 @@
             .table td {
                 padding: 0.75rem;
                 font-size: 0.875rem;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .table-header-right {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 150px;
             }
         }
     </style>
@@ -556,17 +626,30 @@
 
         <!-- 主内容区域 -->
         <div class="main-content">
-            <div class="content-header">
-                <h1 class="content-title">下载任务列表</h1>
-                <button class="btn btn-primary btn-sm" onclick="refreshTasks()">
-                    <i class="fas fa-sync-alt"></i>
-                    刷新
-                </button>
-            </div>
-
             <div class="table-container">
                 <div class="table-header">
-                    <h3>任务管理</h3>
+                    <div class="table-header-left">
+                        <h3>任务管理</h3>
+                    </div>
+                    <div class="table-header-right">
+                        <button class="btn btn-primary btn-sm" onclick="loadTasks()">
+                            <i class="fas fa-sync-alt"></i>
+                            刷新
+                        </button>
+                    </div>
+                    <div class="table-header-right">
+                        <div class="search-group">
+                            <input type="text" id="search-input" class="search-input" placeholder="搜索视频ID或关键词...">
+                            <button class="search-btn" id="search-btn" onclick="performSearch()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <button class="clear-search" onclick="clearSearch()" style="display: none;"
+                            id="clear-search-btn">
+                            <i class="fas fa-times"></i>
+                            清除搜索
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-wrapper">
@@ -607,7 +690,8 @@
         let currentPage = 1;
         let totalPages = 1;
         let totalTasks = 0;
-        let taskStats = { success: 0, processing: 0 };
+        let currentSearch = ''; // 当前搜索关键词
+        let taskStats = { success: 0, processing: 0, error: 0, pending: 0 };
 
         // DOM 元素
         const taskForm = document.getElementById('task-form');
@@ -615,10 +699,13 @@
         const prevPageBtn = document.getElementById('prev-page');
         const nextPageBtn = document.getElementById('next-page');
         const paginationInfo = document.getElementById('pagination-info');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const clearSearchBtn = document.getElementById('clear-search-btn');
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function () {
-            loadTasks(1);
+            loadTasks();
         });
 
         // 状态映射
@@ -626,6 +713,42 @@
             'success': { text: '下载完成', icon: 'check', class: 'success' },
             'processing': { text: '正在下载', icon: 'spinner fa-spin', class: 'processing' },
         };
+
+        // 执行搜索
+        function performSearch() {
+            const searchTerm = searchInput.value.trim();
+
+            if (searchTerm === currentSearch) {
+                return; // 如果搜索词相同，不重复搜索
+            }
+
+            currentSearch = searchTerm;
+            currentPage = 1; // 重置到第一页
+
+            // 显示/隐藏清除按钮
+            if (searchTerm) {
+                clearSearchBtn.style.display = 'block';
+                searchBtn.innerHTML = '<div class="spinner" style="width: 1rem; height: 1rem;"></div>';
+            } else {
+                clearSearchBtn.style.display = 'none';
+            }
+
+            loadTasks();
+            searchBtn.innerHTML = '<i class="fas fa-search"></i>';
+
+        }
+
+        // 清除搜索
+        function clearSearch() {
+            searchInput.value = '';
+            currentSearch = '';
+            currentPage = 1;
+            clearSearchBtn.style.display = 'none';
+            searchBtn.innerHTML = '<i class="fas fa-search"></i>';
+            searchBtn.disabled = false;
+            loadTasks();
+        }
+
 
         // 渲染任务列表
         function renderTasks(tasks) {
@@ -681,14 +804,13 @@
                 </tr>
             `;
         }
-
         // 渲染加载状态
         function renderLoadingState() {
             taskList.innerHTML = `
                 <tr>
-                    <td colspan="4" class="loading">
+                    <td colspan="3" class="loading">
                         <div class="spinner"></div>
-                        正在加载任务列表...
+                        ${currentSearch ? '正在搜索...' : '正在加载任务列表...'}
                     </td>
                 </tr>
             `;
@@ -704,7 +826,7 @@
                         </div>
                         <h3>加载失败</h3>
                         <p>${message}</p>
-                        <button class="btn btn-primary btn-sm" onclick="loadTasks(${currentPage})" style="margin-top: 1rem;">
+                        <button class="btn btn-primary btn-sm" onclick="loadTasks()" style="margin-top: 1rem;">
                             <i class="fas fa-refresh"></i>
                             重新加载
                         </button>
@@ -714,25 +836,26 @@
         }
 
         // 修复：更新分页信息
-        function updatePagination(pageNum, pageSize) {
+        function updatePagination() {
+            pageSize = 10
             if (pageSize && pageSize > 0) {
-                const start = (pageNum - 1) * pageSize + 1;
+                const start = (currentPage - 1) * pageSize + 1;
                 const end = start + pageSize - 1;
                 paginationInfo.textContent = `显示第 ${start}-${end} 项，共 ${totalPages || '未知'} 页`;
             }
 
-            prevPageBtn.disabled = pageNum <= 1;
-            nextPageBtn.disabled = pageNum >= totalPages || totalPages <= 1;
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages || totalPages <= 1;
         }
 
         // 加载任务列表
-        async function loadTasks(page) {
-            if (!document.hidden) { // 只在页面可见时显示加载状态
+        async function loadTasks() {
+            if (!document.hidden) {
                 renderLoadingState();
             }
 
             try {
-                const response = await fetch(`/api/video?page=${page}`);
+                const response = await fetch(`/api/video?page=${currentPage}&q=${currentSearch}`);
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -744,9 +867,7 @@
                     renderTasks(data.items);
                     totalPages = data.total_pages
                     totalTasks = data.total
-                    updatePagination(page, data.items.length);
-                } else {
-                    throw new Error('返回数据格式错误');
+                    updatePagination();
                 }
             } catch (error) {
                 console.error('Error loading tasks:', error);
@@ -757,22 +878,18 @@
             }
         }
 
-        // 刷新任务列表
-        function refreshTasks() {
-            loadTasks(currentPage);
-        }
-
-
         // 分页事件
         prevPageBtn.addEventListener('click', () => {
             if (currentPage > 1) {
-                loadTasks(--currentPage);
+                currentPage = currentPage - 1
+                loadTasks();
             }
         });
 
         nextPageBtn.addEventListener('click', () => {
             if (currentPage < totalPages) {
-                loadTasks(++currentPage);
+                currentPage = currentPage + 1
+                loadTasks();
             }
         });
 
@@ -809,7 +926,7 @@
 
                 if (response.ok) {
                     document.getElementById('video_id_or_url').value = '';
-                    loadTasks(1); // 重新加载第一页
+                    loadTasks(); // 重新加载第一页
                 } else {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -821,6 +938,14 @@
                 submitBtn.innerHTML = originalContent;
             }
         });
+
+        // 添加搜索事件监听
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
     </script>
 </body>
 

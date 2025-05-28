@@ -1,11 +1,11 @@
 import asyncio
 import re
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.dialects.sqlite import insert
-from sqlmodel import select
+from sqlmodel import or_, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app import bilibili
@@ -21,8 +21,14 @@ router = APIRouter(prefix="/api")
 @router.get("/video", dependencies=[PageDepends])
 async def get_video_list(
     session: AsyncSession = Depends(get_db),
+    q: Optional[str] = Query(default="", embed=True),
 ) -> _Page[GetVideoInfoSchema]:
-    statement = select(Video)
+    statement = select(Video).where(
+        or_(
+            Video.title.ilike(f"%{q}%"),
+            Video.belong.ilike(f"%{q}%"),
+        ),
+    )
 
     result = await paging_data(session, statement, GetVideoInfoSchema)
 
