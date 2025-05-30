@@ -1,6 +1,5 @@
-import threading
 from functools import wraps
-from typing import Any, Callable, ClassVar, Coroutine, Optional, ParamSpec, TypeVar
+from typing import Any, Callable, Coroutine, ParamSpec, TypeVar
 
 import aiolimiter
 from aiolimiter import AsyncLimiter

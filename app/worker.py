@@ -3,7 +3,6 @@ import os
 import random
 import re
 import shutil
-import typing
 from pathlib import Path
 
 import aiofiles
@@ -15,10 +14,6 @@ from app.dependencies import AsyncQueueManager
 from app.logger import logger
 from app.models import Video, VideoStatus
 from app.wrappers import background_worker
-
-if typing.TYPE_CHECKING:
-    from app.models import Video
-
 
 CURRENT_DIR = Path(__file__).resolve().parent
 DOWNLOAD_DIR = CURRENT_DIR.parent / "download"
