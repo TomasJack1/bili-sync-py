@@ -19,11 +19,9 @@
 ---
 
 ## 🛠️ 快速开始
-### 下载单个视频
-内容类型选择 单个视频 输入视频BV号
+### 单个视频 输入视频BV号
 ![](https://github.com/TomasJack1/bili-sync-py/blob/main/images/add-video.png?raw=true)
-### 下载合集、系列、收藏夹
-内容对应选择 输入合集、系列、收藏夹页面的URL
+###  输入合集、系列、收藏夹页面的URL
 ![](https://github.com/TomasJack1/bili-sync-py/blob/main/images/add-season.png?raw=true)
 ![](https://github.com/TomasJack1/bili-sync-py/blob/main/images/add-series.png?raw=true)
 ---
