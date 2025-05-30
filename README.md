@@ -21,9 +21,10 @@
 ## 🛠️ 快速开始
 ### 单个视频 输入视频BV号
 ![](https://github.com/TomasJack1/bili-sync-py/blob/main/images/add-video.png?raw=true)
-###  输入合集、系列、收藏夹页面的URL
+###  合集、系列、收藏夹 输入页面的URL
 ![](https://github.com/TomasJack1/bili-sync-py/blob/main/images/add-season.png?raw=true)
 ![](https://github.com/TomasJack1/bili-sync-py/blob/main/images/add-series.png?raw=true)
+
 ---
 
 ## 🛠️ docker部署
