@@ -189,6 +189,7 @@ async def scan_video():
             # 替换视频为合成后有音频的视频
             os.remove(video_page_save_path)
             os.rename(video_page_temp_save_path, video_page_save_path)
+            os.remove(video_page_audio_save_path)
 
             logger.warning(f"{video_bvid}-{video_tile}-{video_page_title}-视频和音频合成成功")
 
